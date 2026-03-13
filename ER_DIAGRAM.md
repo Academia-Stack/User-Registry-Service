@@ -34,6 +34,7 @@ public class Enrollment {
 erDiagram
     STUDENT ||--o{ ENROLLMENT : has
     COURSE  ||--o{ ENROLLMENT : has
+    TEACHER ||--o{ COURSE : teaches
 
     STUDENT {
         BIGINT id PK
@@ -45,6 +46,13 @@ erDiagram
         BIGINT id PK
         VARCHAR title
         INT credits
+        BIGINT teacher_id FK
+    }
+
+    TEACHER {
+        BIGINT teacher_id PK
+        VARCHAR teacher_name
+        INT experience
     }
 
     ENROLLMENT {
@@ -55,3 +63,4 @@ erDiagram
         %% Composite PK (student_id, course_id) is common
     }
 ```
+***
