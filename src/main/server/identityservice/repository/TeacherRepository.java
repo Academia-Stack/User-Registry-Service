@@ -1,0 +1,20 @@
+package identityservice.repository;
+
+import identityservice.entity.Teacher;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+
+@Repository
+public interface TeacherRepository extends JpaRepository<Teacher,Integer> {
+    java.util.Optional<Teacher> findByTeacherId(int teacherId);
+
+    @Query("SELECT t FROM Teacher t WHERE t.teacherName LIKE %?1%")
+    java.util.List<Teacher> findTeachersByName(String modelName);
+
+    @Query("SELECT t FROM Teacher t JOIN Subject c ON c.teacher.teacherId = t.teacherId WHERE c.courseName LIKE %?1%")
+    java.util.List<Teacher> findTeachersBySubject(String subject);
+
+    @Query("SELECT t FROM Teacher t JOIN Subject c ON c.teacher.teacherId = t.teacherId WHERE c.courseId = :courseId")
+    java.util.List<Teacher> findTeachersBySubject(int courseId);
+}
