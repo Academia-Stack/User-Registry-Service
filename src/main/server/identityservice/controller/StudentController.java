@@ -14,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import identityservice.service.SubjectService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/student")
@@ -45,7 +43,7 @@ public class StudentController {
     }
 
     @GetMapping("showStudent/{studentId}")
-    public ResponseEntity<Student> getStudentById(@PathVariable int studentId) {
+    public ResponseEntity<Student> getStudentById(@PathVariable UUID studentId) {
         System.out.println("Student ID: " + studentId);
         Student student = studentService.findByStudentId(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student Not Found with ID: " + studentId));
@@ -61,8 +59,9 @@ public class StudentController {
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
     public ResponseEntity<Map<String, Object>> addStudent(@RequestBody @Valid Student student, BindingResult error) throws Exception {
-        if(error.hasErrors())
-            throw new Exception("Invalid email format");
+        if(error.hasFieldErrors())
+            throw new Exception(
+                    Objects.requireNonNull(error.getFieldError()).getDefaultMessage());
 
         System.out.println(student);
         studentService.addStudent(student);
@@ -74,21 +73,25 @@ public class StudentController {
     @PostMapping(value = "updateStudent/{studentId}",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Student> updateStudent(@PathVariable int studentId, @RequestBody Student student) {
+    public ResponseEntity<Student> updateStudent(@PathVariable UUID studentId, @RequestBody Student student, BindingResult error) throws Exception {
+        if(error.hasFieldErrors())
+            throw new Exception(
+                    Objects.requireNonNull(error.getFieldError()).getDefaultMessage());
+
         student.setStudentId(studentId);
         studentService.updateStudentDetails(student);
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     @GetMapping("getStudentSubjects/{studentId}")
-    public List<Subject> getStudentSubjects(@PathVariable int studentId){
+    public List<Subject> getStudentSubjects(@PathVariable UUID studentId){
         return subjectService.findAllSubjectsOfStudent(studentId);
     }
 
     @PostMapping(value = "deleteStudent",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> deleteStudent(@RequestBody List<Integer> idArray) {
+    public ResponseEntity<Map<String, Object>> deleteStudent(@RequestBody List<UUID> idArray) {
         studentService.deleteStudent(idArray);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Student Deleted Successfully!");
@@ -96,7 +99,7 @@ public class StudentController {
     }
 
     @PostMapping("enrolStudent/{studentId}/{subjectId}")
-    public ResponseEntity<Map<String, Object>> enrolStudent(@PathVariable int studentId, @PathVariable int subjectId) {
+    public ResponseEntity<Map<String, Object>> enrolStudent(@PathVariable UUID studentId, @PathVariable UUID subjectId) {
         if(connectorService.countRecords(subjectId, studentId) >= 1)
             throw new EnrolmentAlreadyExists("Student already enrolled");
         connectorService.enrolStudent(subjectId, studentId);

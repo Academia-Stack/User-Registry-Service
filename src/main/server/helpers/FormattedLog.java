@@ -1,7 +1,7 @@
 package helpers;
 
 public record FormattedLog(
-        int logId,
+        long logId,
         String createdAtDate,
         String createdAtTime,
         String endPoint,

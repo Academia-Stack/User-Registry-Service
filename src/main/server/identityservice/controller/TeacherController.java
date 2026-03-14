@@ -9,11 +9,10 @@ import identityservice.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/Teacher")
@@ -42,7 +41,7 @@ public class TeacherController {
     }
 
     @GetMapping("showTeacher/{TeacherId}")
-    public ResponseEntity<Teacher> getTeacherById(@PathVariable int TeacherId) {
+    public ResponseEntity<Teacher> getTeacherById(@PathVariable UUID TeacherId) {
         Teacher teacher = TeacherService.findTeacherById(TeacherId)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher Not Found with ID: " + TeacherId));
         return new ResponseEntity<>(teacher, HttpStatus.OK);
@@ -51,8 +50,11 @@ public class TeacherController {
     @PostMapping(value = "addTeacher",
                 consumes = {"application/json", "application/xml"},
                 produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> addTeacher(@RequestBody Teacher teacher) {
-        System.out.println(teacher);
+    public ResponseEntity<Map<String, Object>> addTeacher(@RequestBody Teacher teacher, Errors errors) throws Exception {
+        if(errors.hasFieldErrors())
+            throw new Exception(
+                    Objects.requireNonNull(errors.getFieldError()).getDefaultMessage());
+        //System.out.println(teacher);
         TeacherService.addTeacher(teacher);
         Map<String, Object> response = new HashMap<>();
         response.put("TeacherId", teacher.getTeacherId());
@@ -60,7 +62,7 @@ public class TeacherController {
     }
 
     @GetMapping(value = "getSubjects/{teacherId}")
-    public ResponseEntity<List<Subject>> getAllSubjects(@PathVariable int teacherId){
+    public ResponseEntity<List<Subject>> getAllSubjects(@PathVariable UUID teacherId){
         List<Subject> subjects = subjectService.findAllSubjectOfTeacher(teacherId);
         return new ResponseEntity<>(subjects, HttpStatus.OK);
     }
@@ -68,7 +70,7 @@ public class TeacherController {
     @PostMapping(value = "deleteTeacher",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> deleteTeacher(@RequestBody List<Integer> idArray) {
+    public ResponseEntity<Map<String, Object>> deleteTeacher(@RequestBody List<UUID> idArray) {
         TeacherService.deleteTeacher(idArray);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Teacher Deleted Successfully!");
@@ -76,7 +78,8 @@ public class TeacherController {
     }
 
     @PostMapping("assignTeacher/{teacherId}/{subjectId}")
-    public ResponseEntity<Map<String, Object>> assignTeacherToStudent(@PathVariable int teacherId, @PathVariable int subjectId) {
+    public ResponseEntity<Map<String, Object>> assignTeacherToStudent(
+            @PathVariable UUID teacherId, @PathVariable UUID subjectId) {
         connectorService.assignTeacherToSubject(subjectId, teacherId);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Teacher Assigned Successfully!");

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ConnectorService {
@@ -35,7 +36,7 @@ public class ConnectorService {
     @Autowired
     private EnrolmentRepository enrolmentRepository;
 
-    public void assignTeacherToSubject(int subjectId, int teacherId) {
+    public void assignTeacherToSubject(UUID subjectId, UUID teacherId) {
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
         if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
 
@@ -46,7 +47,7 @@ public class ConnectorService {
         subjectRepository.save(course.get());
     }
 
-    public Enrolment enrolStudent(int subjectId, int studentId){
+    public Enrolment enrolStudent(UUID subjectId, UUID studentId){
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
         if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
 
@@ -62,7 +63,7 @@ public class ConnectorService {
         return newEnrolment;
     }
 
-    public Enrolment unenrolStudent(int subjectId, int studentId){
+    public Enrolment unenrolStudent(UUID subjectId, UUID studentId){
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
         if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
 
@@ -76,11 +77,11 @@ public class ConnectorService {
         return record.get();
     }
 
-    public boolean doesRecordExist(int subjectId, int studentId){
+    public boolean doesRecordExist(UUID subjectId, UUID studentId){
         return enrolmentRepository.findEnrolmentByDetails(studentId, subjectId).isPresent();
     }
 
-    public int countRecords(int subjectId, int studentId){
+    public int countRecords(UUID subjectId, UUID studentId){
         return enrolmentRepository.countEnrolmentByDetails(studentId, subjectId);
     }
 }

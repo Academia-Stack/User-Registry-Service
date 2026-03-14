@@ -19,8 +19,8 @@ import java.util.Locale;
 public class LogEntry implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "LOG_ID", nullable = false, unique = true)
-    private Integer logId;
+    @Column(name = "LOG_ID", nullable = false, length = 30, unique = true)
+    private long logId;
 
     private LocalDate createdDate;
     private LocalTime createdTime;

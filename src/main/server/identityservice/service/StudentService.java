@@ -1,6 +1,7 @@
 package identityservice.service;
 
 import identityservice.entity.Student;
+import identityservice.exception.StudentAlreadyExists;
 import identityservice.exception.StudentNotFoundException;
 import identityservice.repository.EnrolmentRepository;
 import identityservice.repository.StudentRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class StudentService {
@@ -19,11 +21,14 @@ public class StudentService {
     private EnrolmentRepository enrolmentRepository;
 
     public Student addStudent(Student student) {
-        return studentRepository.save(student);
+        int isPresent = studentRepository.findStudentByEmail(student.getEmail());
+        if(isPresent >= 1)
+            throw new StudentAlreadyExists("Email already in use");
+        return studentRepository.save(student);  // constraint errors can occur
     }
 
-    public Optional<Student> findByStudentId(int student_Id){
-        return studentRepository.findById(student_Id);
+    public Optional<Student> findByStudentId(UUID studentId){
+        return studentRepository.findById(studentId);
     }
 
     public List<Student> getAllStudentDetails(){
@@ -34,7 +39,7 @@ public class StudentService {
         return studentRepository.findStudentsByName(student_Name);
     }
 
-    public List<Student> findStudentBySubject(int subjectCode){
+    public List<Student> findStudentBySubject(UUID subjectCode){
         return enrolmentRepository.findStudentsBySubject(subjectCode);
     }
 
@@ -49,7 +54,7 @@ public class StudentService {
         studentRepository.save(existingStudentDetails.get());
     }
 
-    public void deleteStudent(List<Integer> arrayOfIds){
+    public void deleteStudent(List<UUID> arrayOfIds){
         arrayOfIds.forEach(id ->{
             if(!studentRepository.existsById(id)){
                 throw new StudentNotFoundException("Student Not Found with ID: "+id);

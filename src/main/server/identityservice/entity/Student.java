@@ -3,12 +3,21 @@ package identityservice.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import helpers.DbColumns;
 import helpers.DbTables;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+
+import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = DbTables.STUDENT_TABLE)
@@ -19,17 +28,22 @@ import jakarta.validation.constraints.Email;
 @ToString
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = DbColumns.ENROLLMENT_STUDENT_ID, length = 30, nullable = false)
-    private int studentId;
+    @UuidGenerator
+    @JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion
+    @Column(name = DbColumns.ENROLLMENT_STUDENT_ID, length = 16, nullable = false, updatable = false)
+    private UUID studentId;
 
     @Column(nullable = false)
+    @NotBlank(message = "Student needs to have a name")
     private String studentName;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Student email field cannot be blank")
     @Email(message = "Invalid email format")
     private String email;
 
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
     @Column(nullable = false, name = "date_of_birth")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate dob;

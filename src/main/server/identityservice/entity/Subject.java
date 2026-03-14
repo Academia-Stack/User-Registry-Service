@@ -2,12 +2,21 @@ package identityservice.entity;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import helpers.DbColumns;
 import helpers.DbTables;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+
+import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = DbTables.COURSE_TABLE)
@@ -18,10 +27,13 @@ import java.io.Serializable;
 @ToString
 public class Subject implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = DbColumns.ENROLLMENT_COURSE_ID, length = 30, nullable = false)
-    private int courseId;
+    @JsonProperty("subjectCode")  // jackson annotation for request body parsing
+    @UuidGenerator
+    @JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion
+    @Column(name = DbColumns.ENROLLMENT_COURSE_ID, length = 16, nullable = false)
+    private UUID courseId;
 
+    @NotBlank(message = "Course name cannot be empty")  // jackson annotation for request body validation
     @Column(nullable = false)
     private String courseName;
 

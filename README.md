@@ -21,16 +21,59 @@ The following guides illustrate how to use some features concretely:
 ***
 ## Important Annotations
 ***
+`@NotNull`
+- 
+- It is a Jakarta Validation annotation.
+- Only checks that the value is **not `null`**; empty strings (`""`) or whitespace are still allowed.
+### Usage
+
+```java
+import jakarta.validation.constraints.NotNull;
+
+@NotNull(message = "This field cannot be null")
+private String something;
+```
+***
+`@NotBlank`
+- 
+- It is a Jakarta Validation annotation.
+- It is used for **Strings only**. Rejects **`null`, empty (`""`), and whitespace-only (`"   "`) values**.
+### Usage
+
+```java
+import jakarta.validation.constraints.NotBlank;
+
+@NotBlank
+@NotNull(message = "This field cannot be blank")
+private String something;
+```
+***
+`@JsonProperty`
+- 
+- It is a Jackson annotation.
+- Rename json field name which will be used for both deserialization (input) and serialization (output).
+### Usage
+
+```java
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonProperty("propertyName")
+private String property;
+```
+***
 `@JsonIgnore`
 - 
+- It is a Jackson annotation.
 - Ignore a property during serialization (no persistance while creating the object) and desrialization (fetching an object the entity).
 - This annotation is often used for nested entities.
 ### Usage
 ```java
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @JsonIgnore
 private Entity entityObject;
 ```
-Fully-qualified classpath: `com.fasterxml.jackson.annotation.JsonIgnore`.
 ***
 `@JoinColumn`
 - 

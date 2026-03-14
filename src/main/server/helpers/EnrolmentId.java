@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
+import java.util.UUID;
+
 @Embeddable
 @Getter
 @Setter
@@ -13,8 +15,8 @@ import lombok.*;
 @EqualsAndHashCode
 public class EnrolmentId implements java.io.Serializable {
     @Column(nullable = false, length = 30)
-    private int studentIdentifier;
+    private UUID studentIdentifier;
 
     @Column(nullable = false, length = 30)
-    private int courseIdentifier;
+    private UUID courseIdentifier;
 }

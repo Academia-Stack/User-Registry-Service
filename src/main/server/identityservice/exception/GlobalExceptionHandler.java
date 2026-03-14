@@ -2,6 +2,7 @@ package identityservice.exception;
 
 import identityservice.entity.LogEntry;
 import identityservice.service.LogService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,11 @@ public class GlobalExceptionHandler {
     @Autowired
     private LogService logService;
 
+    @PostConstruct
+    public void init() {
+        System.out.println("GlobalErrorHandler loaded...");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception exception, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
@@ -36,6 +42,8 @@ public class GlobalExceptionHandler {
         response.put("success", false);
         response.put("error", exception.getMessage());
         return new ResponseEntity<>(response,
-                exceptionClass.contains("NotFound") ? HttpStatus.NOT_FOUND :HttpStatus.INTERNAL_SERVER_ERROR);
+                exceptionClass.contains("NotFound") ? HttpStatus.NOT_FOUND :
+                exceptionClass.contains("AlreadyExists") ? HttpStatus.FORBIDDEN :
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

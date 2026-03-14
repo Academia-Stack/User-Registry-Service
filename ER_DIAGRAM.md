@@ -37,27 +37,27 @@ erDiagram
     TEACHER ||--o{ COURSE : teaches
 
     STUDENT {
-        BIGINT id PK
+        UUID studentId PK
         VARCHAR name
         DATE dob
     }
 
     COURSE {
-        BIGINT id PK
+        UUID courseId PK
         VARCHAR title
         INT credits
-        BIGINT teacher_id FK
+        UUID teacherId FK
     }
 
     TEACHER {
-        BIGINT teacher_id PK
+        UUID teacherId PK
         VARCHAR teacher_name
         INT experience
     }
 
     ENROLLMENT {
-        BIGINT student_id FK
-        BIGINT course_id  FK
+        BIGINT studentId FK
+        BIGINT courseId  FK
         DATE admission_date
         VARCHAR status
         %% Composite PK (student_id, course_id) is common

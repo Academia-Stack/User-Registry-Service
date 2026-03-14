@@ -12,6 +12,7 @@ import identityservice.repository.SubjectRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SubjectService {
@@ -22,7 +23,7 @@ public class SubjectService {
     EnrolmentRepository enrolmentRepository;
 
     @Cacheable(value = "subject", key = "#subjectId", unless = "#result == null")  // value is bucket_name
-    public Optional<Subject> findSubjectById(int subjectId){
+    public Optional<Subject> findSubjectById(UUID subjectId){
         return subjectRepository.findByCourseId(subjectId);
     }
 
@@ -35,11 +36,11 @@ public class SubjectService {
         return subjectRepository.findAll();
     }
 
-    public List<Subject> findAllSubjectsOfStudent(int studentId){
+    public List<Subject> findAllSubjectsOfStudent(UUID studentId){
         return enrolmentRepository.findSubjectsOfStudent(studentId);
     }
 
-    public List<Subject> findAllSubjectOfTeacher(int teacherId){
+    public List<Subject> findAllSubjectOfTeacher(UUID teacherId){
         return subjectRepository.getAllSubjectsByTeacher(teacherId);
     }
 
@@ -47,18 +48,18 @@ public class SubjectService {
         return subjectRepository.getAllSubjectsByName(name);
     }
 
-    @CacheEvict(value = "subject", key = "#subject.subjectId")
+    @CacheEvict(value = "subject", key = "#subject.courseId")
     public void updateSubjectDetails(Subject subject){
         Optional<Subject> existingSubjectDetails = subjectRepository.findByCourseId(subject.getCourseId());
         if(existingSubjectDetails.isEmpty())
-            throw new SubjectNotFoundException("Student Not Found with ID: " + subject.getCourseId());
+            throw new SubjectNotFoundException("Subject Not Found with ID: " + subject.getCourseId());
 
         existingSubjectDetails.get().setCourseName(subject.getCourseName());
         subjectRepository.save(existingSubjectDetails.get());
     }
 
     @CacheEvict(value = "subject", allEntries = true)  // delete all entries
-    public void deleteSubject(List<Integer> arrayOfIds){
+    public void deleteSubject(List<UUID> arrayOfIds){
         arrayOfIds.forEach(id ->{
             if(!subjectRepository.existsById(id)){
                 throw new StudentNotFoundException("Student Not Found with ID: "+id);

@@ -1,17 +1,17 @@
 package identityservice.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import identityservice.entity.Subject;
 import identityservice.exception.StudentNotFoundException;
 import identityservice.service.ConnectorService;
 import identityservice.service.SubjectService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/subject")
@@ -33,7 +33,7 @@ public class SubjectController {
     }
 
     @GetMapping("showSubject/{subjectId}")
-    public ResponseEntity<Subject> getStudentById(@PathVariable int subjectId) {
+    public ResponseEntity<Subject> getStudentById(@PathVariable UUID subjectId) {
         System.out.println("Subject ID: " + subjectId);
         Subject subject = subjectService.findSubjectById(subjectId)
                 .orElseThrow(() -> new StudentNotFoundException("Subject Not Found with ID: " + subjectId));
@@ -48,8 +48,11 @@ public class SubjectController {
     @PostMapping(value = "addSubject",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> addSubject(@RequestBody Subject subject) {
-        System.out.println(subject);
+    public ResponseEntity<Map<String, Object>> addSubject(@RequestBody Subject subject, Errors errors) throws Exception {
+        if(errors.hasFieldErrors())
+            throw new Exception(
+                    Objects.requireNonNull(errors.getFieldError()).getDefaultMessage());
+        //System.out.println(subject);
         subjectService.addSubject(subject);
         Map<String, Object> response = new HashMap<>();
         response.put("subjectId", subject.getCourseId());
@@ -59,7 +62,10 @@ public class SubjectController {
     @PostMapping(value = "updateSubject/{subjectId}",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Subject> updateStudent(@PathVariable int subjectId, @RequestBody Subject subject) {
+    public ResponseEntity<Subject> updateSubject(@PathVariable UUID subjectId, @RequestBody @Valid Subject subject, Errors errors) throws Exception {
+        if(errors.hasFieldErrors())
+            throw new Exception(
+                    Objects.requireNonNull(errors.getFieldError()).getDefaultMessage());
         subject.setCourseId(subjectId);
         subjectService.updateSubjectDetails(subject);
         return new ResponseEntity<>(subject, HttpStatus.OK);
@@ -68,7 +74,7 @@ public class SubjectController {
     @PostMapping(value = "deleteSubject",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> deleteStudent(@RequestBody List<Integer> idArray) {
+    public ResponseEntity<Map<String, Object>> deleteStudent(@RequestBody List<UUID> idArray) {
         subjectService.deleteSubject(idArray);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Subject Deleted Successfully!");
