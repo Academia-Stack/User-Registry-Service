@@ -83,14 +83,14 @@ private Entity entityObject;
 ### Usage
 Let's say we have course entity (many) and teacher entity (one), i.e, one teacher teaches many courses.
 ```java
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "teacher_id")
 private Teacher teacher;
 ```
 Here `fetch = FetchType.LAZY` signifies that we don't automatically fetch the **teacher** object when we're fetching the **course** object. It is only fetched when we call `course.getTeacher()`.
-<br/>Fully-qualified classpath for both these annotations:
-- `@JoinColumn`: `jakarta.persistence.JoinColumn`.
-- `@ManyToOne`: `jakarta.persistence.ManyToOne`.
 ***
 ## Maven Parent overrides
 
