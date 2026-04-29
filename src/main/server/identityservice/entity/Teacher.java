@@ -2,15 +2,13 @@ package identityservice.entity;
 
 import helpers.DbColumns;
 import helpers.DbTables;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.UUID;
-
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = DbTables.TEACHER_TABLE)
@@ -19,18 +17,28 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Teacher {
+public class Teacher implements Serializable {
     @Id
     @UuidGenerator
-    @JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion
+    //@JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion since MySQL doesn't have any UUID type. Not necessary for Postgres
     @Column(name = DbColumns.SUBJECT_TEACHER_ID, length = 16, nullable = false, updatable = false)
     private UUID teacherId;
 
-    @NotBlank(message = "Teacher name cannot be empty")  // jackson annotation for request body validation
     @Column(nullable = false)
-    private String teacherName;
+    @NotBlank(message = "Teacher needs to have a first name")
+    @Pattern(regexp = "^[A-Za-z ]+$",
+            message = "Only letters and spaces allowed")
+    private String firstName;
 
-    @NotBlank(message = "We don't hire inexperience teachers")  // jackson annotation for request body validation
+    @Column(nullable = false)
+    @NotBlank(message = "Teacher needs to have a last name")
+    @Pattern(regexp = "^[A-Za-z ]+$",
+            message = "Only letters and spaces allowed")
+    private String lastName;
+
+    @NotNull(message = "Experience field cannot be empty")  // jackson annotation for request body validation
+    @Min(value = 1, message = "Experience must be at least 1 year")
+    @Max(value = 40, message = "Experience cannot exceed 40 years")
     @Column(nullable = false)
     private int experience;
 

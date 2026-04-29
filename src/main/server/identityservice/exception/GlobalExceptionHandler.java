@@ -1,7 +1,7 @@
 package identityservice.exception;
 
 import identityservice.entity.LogEntry;
-import identityservice.service.LogService;
+import identityservice.service.KafkaClient;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @Autowired
-    private LogService logService;
+    private KafkaClient kafkaClient;
 
     @PostConstruct
     public void init() {
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 request.getMethod().toUpperCase(),
                 exceptionClass);
-        logService.saveLog(log);
+        kafkaClient.sendLogEntry(log);
 
         response.put("success", false);
         response.put("error", exception.getMessage());

@@ -1,8 +1,8 @@
 package helpers;
 
+import lombok.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.*;
 
 import java.util.UUID;
 
@@ -14,9 +14,9 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 public class EnrolmentId implements java.io.Serializable {
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 16)
     private UUID studentIdentifier;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 16)
     private UUID courseIdentifier;
 }

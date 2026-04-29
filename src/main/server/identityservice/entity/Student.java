@@ -3,21 +3,19 @@ package identityservice.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import helpers.DbColumns;
 import helpers.DbTables;
+import identityservice.entity.validators.MinAge;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import lombok.*;
-
-import java.time.LocalDate;
-
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+
+import lombok.*;
+import java.time.LocalDate;
+import jakarta.persistence.*;
 
 import java.util.UUID;
-
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = DbTables.STUDENT_TABLE)
@@ -29,19 +27,28 @@ import org.hibernate.type.SqlTypes;
 public class Student {
     @Id
     @UuidGenerator
-    @JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion
+    //@JdbcTypeCode(SqlTypes.BINARY)  // very important for type conversion since MySQL doesn't have any UUID type. Not necessary for Postgres
     @Column(name = DbColumns.ENROLLMENT_STUDENT_ID, length = 16, nullable = false, updatable = false)
     private UUID studentId;
 
     @Column(nullable = false)
-    @NotBlank(message = "Student needs to have a name")
-    private String studentName;
+    @NotBlank(message = "Student needs to have a first name")
+    @Pattern(regexp = "^[A-Za-z ]+$",
+            message = "Only letters and spaces allowed")
+    private String firstName;
+
+    @Column(nullable = false)
+    @NotBlank(message = "Student needs to have a last name")
+    @Pattern(regexp = "^[A-Za-z ]+$",
+            message = "Only letters and spaces allowed")
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Student email field cannot be blank")
     @Email(message = "Invalid email format")
     private String email;
 
+    @MinAge(minValue = 12, maxValue = 30)
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     @Column(nullable = false, name = "date_of_birth")

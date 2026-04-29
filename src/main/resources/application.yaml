@@ -1,21 +1,19 @@
 server:
   port: 8000
 
-timezones:
-  zones:
-    - Asia/Kolkata
-    - Europe/London
-    - America/New_York
-
 spring:
   application:
     name: People Service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/CourseManagment
-    username: darkmortal
-    password: KAMEHAMEHA
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: ${DB_HOST}
+    port: ${DB_PORT}
+    database: ${DB_NAME}
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+
+    username: ${DB_UNAME}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver #com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -23,11 +21,40 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect #org.hibernate.dialect.MySQL8Dialect
 
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      timeout: 60000
-      # password:   # leave blank if none
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      ssl:
+        enabled: true
+      timeout: ${REDIS_TIMEOUT}
+      password: ${REDIS_PASS} # leave blank if none
+
+kafka:
+  host: ${KAFKA_HOST}
+  port: ${KAFKA_PORT}
+  bootstrap-servers: ${kafka.host}:${kafka.port}
+  username: ${KAFKA_UNAME}
+  password: ${KAFKA_PASS}
+
+  topic: user-registry
+  certDir: ${CERT_DIR}
+
+  ssl:
+    truststore-type: PEM
+    keystore-type: PEM
+    key-location: ${kafka.certDir}/service.key
+    truststore-location: ${kafka.certDir}/ca.pem
+    keystore-location: ${kafka.certDir}/svc.pem
+
+  properties:
+    security.protocol: SSL
+    schema.registry.url: https://${kafka.host}:${kafka.port}
+    basic.auth.credentials.source: USER_INFO
+    basic.auth.user.info: ${kafka.username}:${kafka.password}
+
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: identityservice.service.JacksonSerializer

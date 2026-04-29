@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     java.util.Optional<Teacher> findByTeacherId(UUID teacherId);
 
-    @Query("SELECT t FROM Teacher t WHERE t.teacherName LIKE %?1%")
-    java.util.List<Teacher> findTeachersByName(String modelName);
+    @Query("SELECT t FROM Teacher t WHERE t.firstName LIKE %?1% OR t.lastName LIKE %?1%")
+    java.util.List<Teacher> findTeachersByName(String name);
 
     @Query("SELECT t FROM Teacher t JOIN Subject c ON c.teacher.teacherId = t.teacherId WHERE c.courseName LIKE %?1%")
     java.util.List<Teacher> findTeachersBySubject(String subject);

@@ -19,6 +19,10 @@ public class TeacherService {
         return TeacherRepository.save(teacher);
     }
 
+    public List<Teacher> getTeacherByName(String name){
+        return TeacherRepository.findTeachersByName(name);
+    }
+
     public Optional<Teacher> findTeacherById(UUID studentId){
         return TeacherRepository.findById(studentId);
     }

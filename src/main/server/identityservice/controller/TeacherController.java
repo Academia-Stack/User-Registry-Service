@@ -6,6 +6,7 @@ import identityservice.exception.TeacherNotFoundException;
 import identityservice.service.ConnectorService;
 import identityservice.service.SubjectService;
 import identityservice.service.TeacherService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,14 +51,14 @@ public class TeacherController {
     @PostMapping(value = "addTeacher",
                 consumes = {"application/json", "application/xml"},
                 produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> addTeacher(@RequestBody Teacher teacher, Errors errors) throws Exception {
+    public ResponseEntity<Map<String, Object>> addTeacher(@RequestBody @Valid Teacher teacher, Errors errors) throws Exception {
         if(errors.hasFieldErrors())
             throw new Exception(
                     Objects.requireNonNull(errors.getFieldError()).getDefaultMessage());
-        //System.out.println(teacher);
+
         TeacherService.addTeacher(teacher);
         Map<String, Object> response = new HashMap<>();
-        response.put("TeacherId", teacher.getTeacherId());
+        response.put("teacherId", teacher.getTeacherId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -85,21 +86,4 @@ public class TeacherController {
         response.put("message", "Teacher Assigned Successfully!");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-    /*@ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception exception, HttpServletRequest request) {
-        Map<String, Object> response = new HashMap<>();
-
-        LogEntry log = new LogEntry(
-                exception.getMessage(),
-                request.getRequestURI(),
-                request.getMethod().toUpperCase(),
-                exception.getClass().getName());
-        logService.saveLog(log);
-
-        response.put("success", false);
-        response.put("error", exception.getMessage());
-        return new ResponseEntity<>(response,
-                exception.getClass().getName().contains("NotFound") ? HttpStatus.NOT_FOUND :HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
 }

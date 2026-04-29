@@ -18,6 +18,11 @@ target/
 *.iml
 *.ipr
 
+# auth certs
+*.pem
+
+.env
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

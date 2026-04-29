@@ -58,10 +58,10 @@ public class StudentController {
     @PostMapping(value = "addStudent",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> addStudent(@RequestBody @Valid Student student, BindingResult error) throws Exception {
-        if(error.hasFieldErrors())
+    public ResponseEntity<Map<String, Object>> addStudent(@RequestBody @Valid Student student, BindingResult result) throws Exception {
+        if(result.hasFieldErrors())
             throw new Exception(
-                    Objects.requireNonNull(error.getFieldError()).getDefaultMessage());
+                    Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
 
         System.out.println(student);
         studentService.addStudent(student);
@@ -73,10 +73,10 @@ public class StudentController {
     @PostMapping(value = "updateStudent/{studentId}",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Student> updateStudent(@PathVariable UUID studentId, @RequestBody Student student, BindingResult error) throws Exception {
-        if(error.hasFieldErrors())
+    public ResponseEntity<Student> updateStudent(@PathVariable UUID studentId, @RequestBody Student student, BindingResult result) throws Exception {
+        if(result.hasFieldErrors())
             throw new Exception(
-                    Objects.requireNonNull(error.getFieldError()).getDefaultMessage());
+                    Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
 
         student.setStudentId(studentId);
         studentService.updateStudentDetails(student);
@@ -107,21 +107,4 @@ public class StudentController {
         response.put("message", "Student Enrolled Successfully!");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-    /*@ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception exception, HttpServletRequest request) {
-        Map<String, Object> response = new HashMap<>();
-
-        LogEntry log = new LogEntry(
-                exception.getMessage(),
-                request.getRequestURI(),
-                request.getMethod().toUpperCase(),
-                exception.getClass().getName());
-        logService.saveLog(log);
-
-        response.put("success", false);
-        response.put("error", exception.getMessage());
-        return new ResponseEntity<>(response,
-                exception.getClass().getName().contains("NotFound") ? HttpStatus.NOT_FOUND :HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
 }

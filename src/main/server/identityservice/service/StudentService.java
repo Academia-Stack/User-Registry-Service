@@ -48,7 +48,8 @@ public class StudentService {
         if(existingStudentDetails.isEmpty())
             throw new StudentNotFoundException("Student Not Found with ID: " + student.getStudentId());
 
-        existingStudentDetails.get().setStudentName(student.getStudentName());
+        existingStudentDetails.get().setFirstName(student.getFirstName());
+        existingStudentDetails.get().setLastName(student.getLastName());
         existingStudentDetails.get().setEmail(student.getEmail());
         existingStudentDetails.get().setDob(student.getDob());
         studentRepository.save(existingStudentDetails.get());

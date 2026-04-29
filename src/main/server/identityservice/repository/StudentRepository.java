@@ -13,7 +13,7 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, UUID> {
     Optional<Student> findByStudentId(UUID studentId);
 
-    @Query("SELECT s FROM Student s WHERE s.studentName LIKE %?1%")
+    @Query("SELECT s FROM Student s WHERE s.firstName LIKE %?1% OR s.lastName LIKE %?1%")
     List<Student> findStudentsByName(String studentName);
 
     @Query("SELECT COUNT(s) from Student s WHERE s.email = :email_")
