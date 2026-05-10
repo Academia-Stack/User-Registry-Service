@@ -23,7 +23,7 @@ Base path:
 
 ### Welcome Endpoint
 
-**GET /student**
+> GET /student
 
 Returns a welcome message for the Student Management System.
 
@@ -31,7 +31,7 @@ Returns a welcome message for the Student Management System.
 
 ### Get All Students
 
-**GET /student/showAllStudents**
+> GET /student/showAllStudents
 
 Returns a list of all students in the system.
 
@@ -39,7 +39,7 @@ Returns a list of all students in the system.
 
 ### Get Student by ID
 
-**GET /student/showStudent/{studentId}**
+> GET /student/showStudent/{studentId}
 
 Retrieves a student using their unique ID.
 
@@ -47,7 +47,7 @@ Retrieves a student using their unique ID.
 
 ### Get Students by Name
 
-**GET /student/showStudentsByName/{studentName}**
+> GET /student/showStudentsByName/{studentName}
 
 Returns a list of students that match the given name.
 
@@ -55,7 +55,7 @@ Returns a list of students that match the given name.
 
 ### Add New Student
 
-**POST /student/addStudent**
+> POST /student/addStudent
 
 Creates a new student record.
 
@@ -79,7 +79,7 @@ Returns the generated `studentId`.
 
 ### Update Student
 
-**POST /student/updateStudent/{studentId}**
+> POST /student/updateStudent/{studentId}
 
 Updates the details of an existing student.
 
@@ -87,7 +87,7 @@ Updates the details of an existing student.
 
 ### Get Subjects of a Student
 
-**GET /student/getStudentSubjects/{studentId}**
+> GET /student/getStudentSubjects/{studentId}
 
 Returns all subjects in which a student is enrolled.
 
@@ -95,7 +95,7 @@ Returns all subjects in which a student is enrolled.
 
 ### Delete Students
 
-**POST /student/deleteStudent**
+> POST /student/deleteStudent
 
 Deletes one or more students using a list of student IDs.
 
@@ -111,7 +111,7 @@ Returns a success message after deletion.
 
 ### Enrol Student to Subject
 
-**POST /student/enrolStudent/{studentId}/{subjectId}**
+> POST /student/enrolStudent/{studentId}/{subjectId}
 
 Enrolls a student in a subject.
 If the student is already enrolled, an error is thrown.
@@ -130,7 +130,7 @@ Base path:
 
 ### Welcome Endpoint
 
-**GET /Teacher**
+> GET /Teacher
 
 Returns a welcome message for the Teacher Management System.
 
@@ -138,7 +138,7 @@ Returns a welcome message for the Teacher Management System.
 
 ### Get All Teachers
 
-**GET /Teacher/showAllTeachers**
+> GET /Teacher/showAllTeachers
 
 Returns a list of all teachers in the system.
 
@@ -146,7 +146,7 @@ Returns a list of all teachers in the system.
 
 ### Get Teacher by ID
 
-**GET /Teacher/showTeacher/{TeacherId}**
+> GET /Teacher/showTeacher/{TeacherId}
 
 Retrieves a teacher using their unique ID.
 
@@ -154,7 +154,7 @@ Retrieves a teacher using their unique ID.
 
 ### Add Teacher
 
-**POST /Teacher/addTeacher**
+> POST /Teacher/addTeacher
 
 Creates a new teacher record.
 
@@ -178,7 +178,7 @@ Returns the generated `TeacherId`.
 
 ### Get Subjects of a Teacher
 
-**GET /Teacher/getSubjects/{teacherId}**
+> GET /Teacher/getSubjects/{teacherId}
 
 Returns all subjects assigned to a teacher.
 
@@ -186,7 +186,7 @@ Returns all subjects assigned to a teacher.
 
 ### Delete Teachers
 
-**POST /Teacher/deleteTeacher**
+> POST /Teacher/deleteTeacher
 
 Deletes one or more teachers using a list of teacher IDs.
 
@@ -202,7 +202,7 @@ Returns a success message after deletion.
 
 ### Assign Teacher to Subject
 
-**POST /Teacher/assignTeacher/{teacherId}/{subjectId}**
+> POST /Teacher/assignTeacher/{teacherId}/{subjectId}
 
 Assigns a teacher to a specific subject.
 
@@ -220,7 +220,7 @@ Base path:
 
 ### Get All Logs
 
-**GET /logs**
+> GET /logs
 
 Returns all system logs formatted for readability.
 
@@ -228,7 +228,7 @@ Returns all system logs formatted for readability.
 
 ### Get Log by ID
 
-**GET /logs/{logId}**
+> GET /logs/{logId}
 
 Retrieves a specific log entry by its ID.
 
@@ -269,3 +269,4 @@ The **User Registry Service** acts as the central identity and academic registry
 * System logs
 
 It will later integrate with other services in the ecosystem using **Netflix Eureka for service discovery**.
+***
