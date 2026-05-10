@@ -7,7 +7,8 @@ This schema is used in the topics for validating messages
   "title": "LogEntry",
   "properties": {
     "logId": {
-      "type": "integer"
+      "type": "string",
+      "format": "uuid"
     },
     "createdDate": {
       "type": "string",
