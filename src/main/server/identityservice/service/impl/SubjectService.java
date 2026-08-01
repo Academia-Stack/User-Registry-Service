@@ -5,8 +5,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import identityservice.entity.Subject;
-import identityservice.exception.StudentNotFoundException;
-import identityservice.exception.SubjectNotFoundException;
+import identityservice.exception.EntityNotFoundException;
 import identityservice.repository.EnrolmentRepository;
 import identityservice.repository.SubjectRepository;
 
@@ -15,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class SubjectService {
+public class SubjectService implements ISubjectService {
     @Autowired
     SubjectRepository subjectRepository;
 
@@ -52,7 +51,7 @@ public class SubjectService {
     public void updateSubjectDetails(Subject subject){
         Optional<Subject> existingSubjectDetails = subjectRepository.findByCourseId(subject.getCourseId());
         if(existingSubjectDetails.isEmpty())
-            throw new SubjectNotFoundException("Subject Not Found with ID: " + subject.getCourseId());
+            throw new EntityNotFoundException("Subject Not Found with ID: " + subject.getCourseId());
 
         existingSubjectDetails.get().setCourseName(subject.getCourseName());
         subjectRepository.save(existingSubjectDetails.get());
@@ -62,7 +61,7 @@ public class SubjectService {
     public void deleteSubject(List<UUID> arrayOfIds){
         arrayOfIds.forEach(id ->{
             if(!subjectRepository.existsById(id)){
-                throw new StudentNotFoundException("Student Not Found with ID: "+id);
+                throw new EntityNotFoundException("Subject Not Found with ID: "+id);
             }
             subjectRepository.deleteById(id);
         });

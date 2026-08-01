@@ -1,7 +1,7 @@
 package identityservice.service;
 
 import identityservice.entity.Teacher;
-import identityservice.exception.TeacherNotFoundException;
+import identityservice.exception.EntityNotFoundException;
 import identityservice.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class TeacherService {
+public class TeacherService implements ITeacherService {
     @Autowired
     private TeacherRepository TeacherRepository;
 
@@ -41,7 +41,7 @@ public class TeacherService {
     public void deleteTeacher(List<UUID> arrayOfIds){
         arrayOfIds.forEach(id ->{
             if(!TeacherRepository.existsById(id)){
-                throw new TeacherNotFoundException("Teacher Not Found with ID: "+id);
+                throw new EntityNotFoundException("Teacher Not Found with ID: "+id);
             }
             TeacherRepository.deleteById(id);
         });

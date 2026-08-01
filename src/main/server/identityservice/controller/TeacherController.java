@@ -2,14 +2,14 @@ package identityservice.controller;
 
 import identityservice.entity.Subject;
 import identityservice.entity.Teacher;
-import identityservice.exception.TeacherNotFoundException;
-import identityservice.service.ConnectorService;
-import identityservice.service.SubjectService;
-import identityservice.service.TeacherService;
+import identityservice.exception.EntityNotFoundException;
+import identityservice.service.IConnectorService;
+import identityservice.service.ISubjectService;
+import identityservice.service.ITeacherService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,16 +20,16 @@ import java.util.*;
 public class TeacherController {
 
     @Autowired
-    private TeacherService TeacherService;
+    private ITeacherService TeacherService;
 
     @Autowired
-    private SubjectService subjectService;
+    private ISubjectService subjectService;
 
     /*@Autowired
     private LogService logService;*/
 
     @Autowired
-    private ConnectorService connectorService;
+    private IConnectorService connectorService;
 
     @GetMapping("")
     public String getMsg() {
@@ -42,16 +42,16 @@ public class TeacherController {
     }
 
     @GetMapping("showTeacher/{TeacherId}")
-    public ResponseEntity<Teacher> getTeacherById(@PathVariable UUID TeacherId) {
-        Teacher teacher = TeacherService.findTeacherById(TeacherId)
-                .orElseThrow(() -> new TeacherNotFoundException("Teacher Not Found with ID: " + TeacherId));
-        return new ResponseEntity<>(teacher, HttpStatus.OK);
+    public Teacher getTeacherById(@PathVariable UUID TeacherId) {
+        return TeacherService.findTeacherById(TeacherId)
+                .orElseThrow(() -> new EntityNotFoundException("Teacher Not Found with ID: " + TeacherId));
     }
 
     @PostMapping(value = "addTeacher",
                 consumes = {"application/json", "application/xml"},
                 produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> addTeacher(@RequestBody @Valid Teacher teacher, Errors errors) throws Exception {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> addTeacher(@RequestBody @Valid Teacher teacher, Errors errors) throws Exception {
         if(errors.hasFieldErrors())
             throw new Exception(
                     Objects.requireNonNull(errors.getFieldError()).getDefaultMessage());
@@ -59,31 +59,30 @@ public class TeacherController {
         TeacherService.addTeacher(teacher);
         Map<String, Object> response = new HashMap<>();
         response.put("teacherId", teacher.getTeacherId());
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return response;
     }
 
     @GetMapping(value = "getSubjects/{teacherId}")
-    public ResponseEntity<List<Subject>> getAllSubjects(@PathVariable UUID teacherId){
-        List<Subject> subjects = subjectService.findAllSubjectOfTeacher(teacherId);
-        return new ResponseEntity<>(subjects, HttpStatus.OK);
+    public List<Subject> getAllSubjects(@PathVariable UUID teacherId){
+        return subjectService.findAllSubjectOfTeacher(teacherId);
     }
 
     @PostMapping(value = "deleteTeacher",
             consumes = {"application/json", "application/xml"},
             produces = {"application/json", "application/xml"})
-    public ResponseEntity<Map<String, Object>> deleteTeacher(@RequestBody List<UUID> idArray) {
+    public Map<String, Object> deleteTeacher(@RequestBody List<UUID> idArray) {
         TeacherService.deleteTeacher(idArray);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Teacher Deleted Successfully!");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
     }
 
     @PostMapping("assignTeacher/{teacherId}/{subjectId}")
-    public ResponseEntity<Map<String, Object>> assignTeacherToStudent(
+    public Map<String, Object> assignTeacherToStudent(
             @PathVariable UUID teacherId, @PathVariable UUID subjectId) {
         connectorService.assignTeacherToSubject(subjectId, teacherId);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Teacher Assigned Successfully!");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
     }
 }

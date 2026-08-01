@@ -2,7 +2,7 @@ package identityservice.service;
 
 import identityservice.entity.Student;
 import identityservice.exception.StudentAlreadyExists;
-import identityservice.exception.StudentNotFoundException;
+import identityservice.exception.EntityNotFoundException;
 import identityservice.repository.EnrolmentRepository;
 import identityservice.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class StudentService {
+public class StudentService implements IStudentService {
     @Autowired
     private StudentRepository studentRepository;
 
@@ -46,7 +46,7 @@ public class StudentService {
     public void updateStudentDetails(Student student){
         Optional<Student> existingStudentDetails = studentRepository.findByStudentId(student.getStudentId());
         if(existingStudentDetails.isEmpty())
-            throw new StudentNotFoundException("Student Not Found with ID: " + student.getStudentId());
+            throw new EntityNotFoundException("Student Not Found with ID: " + student.getStudentId());
 
         existingStudentDetails.get().setFirstName(student.getFirstName());
         existingStudentDetails.get().setLastName(student.getLastName());
@@ -58,7 +58,7 @@ public class StudentService {
     public void deleteStudent(List<UUID> arrayOfIds){
         arrayOfIds.forEach(id ->{
             if(!studentRepository.existsById(id)){
-                throw new StudentNotFoundException("Student Not Found with ID: "+id);
+                throw new EntityNotFoundException("Student Not Found with ID: "+id);
             }
             studentRepository.deleteById(id);
         });

@@ -1,7 +1,8 @@
-package identityservice.exception;
+package identityservice.controller.common;
 
+import identityservice.dto.ExceptionDTO;
 import identityservice.entity.LogEntry;
-import identityservice.service.KafkaClient;
+import identityservice.service.IKafkaClient;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @Autowired
-    private KafkaClient kafkaClient;
+    private IKafkaClient kafkaClient;
 
     @PostConstruct
     public void init() {
@@ -27,23 +28,29 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception exception, HttpServletRequest request) {
+    public ResponseEntity<ExceptionDTO<Map<String, Object>>> handleGlobalException(
+        Exception exception, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         String[] classPath = exception.getClass().getName().split("\\.");
         String exceptionClass = classPath[classPath.length - 1];
 
         LogEntry log = new LogEntry(
-                exception.getMessage(),
-                request.getRequestURI(),
-                request.getMethod().toUpperCase(),
-                exceptionClass);
+            exception.getMessage(),
+            request.getRequestURI(),
+            request.getMethod().toUpperCase(),
+            exceptionClass);
         kafkaClient.sendLogEntry(log);
 
-        response.put("success", false);
         response.put("error", exception.getMessage());
-        return new ResponseEntity<>(response,
-                exceptionClass.contains("NotFound") ? HttpStatus.NOT_FOUND :
-                exceptionClass.contains("AlreadyExists") ? HttpStatus.FORBIDDEN :
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        response.put("endpoint", log.getEndPoint());
+        response.put("httpMethod", log.getMethod());
+
+        ExceptionDTO<Map<String, Object>> responseObj =
+                ExceptionDTO.<Map<String, Object>>builder().data(response).build();
+
+        return new ResponseEntity<ExceptionDTO<Map<String, Object>>>(responseObj,
+           exceptionClass.contains("NotFound") ? HttpStatus.NOT_FOUND
+           : exceptionClass.contains("AlreadyExists") ? HttpStatus.FORBIDDEN
+           : HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

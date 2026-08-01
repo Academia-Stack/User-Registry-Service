@@ -5,15 +5,13 @@ import identityservice.entity.Teacher;
 import identityservice.entity.Student;
 import identityservice.entity.Enrolment;
 
-import identityservice.exception.EnrolmentNotFoundException;
+import identityservice.exception.EntityNotFoundException;
 import identityservice.repository.SubjectRepository;
 import identityservice.repository.TeacherRepository;
 import identityservice.repository.StudentRepository;
 import identityservice.repository.EnrolmentRepository;
 
-import identityservice.exception.StudentNotFoundException;
-import identityservice.exception.TeacherNotFoundException;
-import identityservice.exception.SubjectNotFoundException;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ConnectorService {
+public class ConnectorService implements IConnectorService {
     @Autowired
     private SubjectRepository subjectRepository;
 
@@ -38,10 +36,10 @@ public class ConnectorService {
 
     public void assignTeacherToSubject(UUID subjectId, UUID teacherId) {
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
-        if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
+        if(course.isEmpty()) throw new EntityNotFoundException("Subject Not Found with ID: " + subjectId);
 
         Optional<Teacher> teacher = teacherRepository.findByTeacherId(teacherId);
-        if(teacher.isEmpty()) throw  new TeacherNotFoundException("Teacher Not Found with ID: " + teacherId);
+        if(teacher.isEmpty()) throw  new EntityNotFoundException("Teacher Not Found with ID: " + teacherId);
 
         course.get().setTeacher(teacher.get());
         subjectRepository.save(course.get());
@@ -49,10 +47,10 @@ public class ConnectorService {
 
     public Enrolment enrolStudent(UUID subjectId, UUID studentId){
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
-        if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
+        if(course.isEmpty()) throw new EntityNotFoundException("Subject Not Found with ID: " + subjectId);
 
         Optional<Student> student = studentRepository.findByStudentId(studentId);
-        if(student.isEmpty()) throw  new StudentNotFoundException("Student Not Found with ID: " + studentId);
+        if(student.isEmpty()) throw  new EntityNotFoundException("Student Not Found with ID: " + studentId);
 
         Enrolment newEnrolment = new Enrolment();
         newEnrolment.setStudent(student.get());
@@ -65,13 +63,13 @@ public class ConnectorService {
 
     public Enrolment unenrolStudent(UUID subjectId, UUID studentId){
         Optional<Subject> course = subjectRepository.findByCourseId(subjectId);
-        if(course.isEmpty()) throw new SubjectNotFoundException("Subject Not Found with ID: " + subjectId);
+        if(course.isEmpty()) throw new EntityNotFoundException("Subject Not Found with ID: " + subjectId);
 
         Optional<Student> student = studentRepository.findByStudentId(studentId);
-        if(student.isEmpty()) throw  new StudentNotFoundException("Student Not Found with ID: " + studentId);
+        if(student.isEmpty()) throw  new EntityNotFoundException("Student Not Found with ID: " + studentId);
 
         Optional<Enrolment> record = enrolmentRepository.findEnrolmentByDetails(studentId, subjectId);
-        if(record.isEmpty()) throw new EnrolmentNotFoundException("Enrolment Not Found");
+        if(record.isEmpty()) throw new EntityNotFoundException("Enrolment Not Found");
 
         enrolmentRepository.delete(record.get());
         return record.get();
